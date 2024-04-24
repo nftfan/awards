@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallets, Quantity, and Earnings</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #aaa;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+        img {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px; /* Add some margin between the image and the wallet address */
+        }
+        @media screen and (max-width: 600px) {
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table id="walletTable">
+        <caption>SUBFAN SCAN BY NFTFANS TOKEN</caption>
+        <thead>
+            <tr>
+                <th>Awards</th>
+                <th>Fan</th>
+                <th>Subs</th>
+                <th>Earnings $</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Table rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Paste your data string here
+        var dataString = `0x17ad66e208396df7f496c2ddbf5d5ea498f17d5c1
+0x17ad66e208396df7f496c2ddbf5d5ea498f17d5c1
+0x17ad66e208396df7f496c2ddbf5d5ea498f17d5c1
+0x17ad66e208396df7f496c2ddbf5d5ea498f17d5c1
+0x17ad66e208396df7f496c2ddbf5d5ea498f17d5c1
+0x003532936369ec520c6befeaf1001449480e3f111
+0x003532936369ec520c6befeaf1001449480e3f111
+0x003532936369ec520c6befeaf1001449480e3f111
+0x003532936369ec520c6befeaf1001449480e3f111`;
+
+        // Split the data string into an array of lines
+        var data = dataString.split('\n');
+
+        // Object to store wallet addresses, quantities, and earnings
+        var walletData = {};
+
+        // Parse the data and aggregate quantities for each wallet
+        data.forEach(function(item) {
+            var address = item.slice(0, 42).trim(); // Extract the address from the first 42 characters
+            var quantity = parseInt(item.slice(42).trim(), 10); // Extract the quantity from the remaining characters
+            if (quantity === 1) {
+                if (walletData.hasOwnProperty(address)) {
+                    walletData[address].quantity += quantity;
+                    walletData[address].earnings += quantity / 2000;
+                } else {
+                    walletData[address] = {
+                        quantity: quantity,
+                        earnings: quantity / 2000
+                    };
+                }
+            }
+        });
+
+        // Sort wallet data based on quantity (descending order)
+        var sortedWalletData = Object.keys(walletData).sort(function(a, b) {
+            return walletData[b].quantity - walletData[a].quantity;
+        });
+
+        // Function to generate table rows from walletData object
+        function generateTableRows() {
+            var tableBody = document.getElementById("tableBody");
+            var top5Count = 0;
+            var top1Count = 0;
+            sortedWalletData.forEach(function(address) {
+                var row = document.createElement("tr");
+                var imgCell = document.createElement("td");
+                var fromCell = document.createElement("td");
+                var quantityCell = document.createElement("td");
+                var earningsCell = document.createElement("td");
+
+                // Add the first image for top 5 wallets
+                if (top5Count < 5) {
+                    var img1 = document.createElement("img");
+                    img1.src = "https://i.seadn.io/s/raw/files/ff471de455f9c30f5ebe47495ec40ba3.gif?auto=format&dpr=1&w=1000";
+                    imgCell.appendChild(img1);
+                    top5Count++;
+                }
+
+                // Add the second image for the top 1 wallet
+                if (top1Count < 5) {
+                    var img2 = document.createElement("img");
+                    img2.src = "https://i.seadn.io/s/raw/files/d2ee9e4492b347033021f14d7ae6ba58.gif?auto=format&dpr=1&w=1000";
+                    img2.style.marginLeft = "1px"; // Add 1px margin to the left to create separation
+                    imgCell.appendChild(img2);
+                    top1Count++;
+                }
+
+                fromCell.textContent = address;
+                quantityCell.textContent = numberWithCommas(walletData[address].quantity);
+                earningsCell.textContent = numberWithCommas(walletData[address].earnings.toFixed(2)); // Round to 2 decimal places
+
+                row.appendChild(imgCell);
+                row.appendChild(fromCell);
+                row.appendChild(quantityCell);
+                row.appendChild(earningsCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Format number with commas
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Generate table rows when the page loads
+        window.onload = generateTableRows;
+    </script>
+</body>
+</html>
